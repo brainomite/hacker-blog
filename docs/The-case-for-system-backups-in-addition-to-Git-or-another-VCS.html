@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>The Case For System Backups In Addition To Git Or Another Vcs</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>The Case For System Backups In Addition To Git Or Another Vcs | Aaron’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="The Case For System Backups In Addition To Git Or Another Vcs" />
+<meta name="author" content="Aaron Young" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="As a former IT professional, the mantra of backups has been drilled into me. I feel that my fellow software engineers can fall into a false sense of security because we are trained to use a version control system (VCS) like git as part of our development workflow." />
+<meta property="og:description" content="As a former IT professional, the mantra of backups has been drilled into me. I feel that my fellow software engineers can fall into a false sense of security because we are trained to use a version control system (VCS) like git as part of our development workflow." />
+<link rel="canonical" href="http://localhost:4000/The-case-for-system-backups-in-addition-to-Git-or-another-VCS" />
+<meta property="og:url" content="http://localhost:4000/The-case-for-system-backups-in-addition-to-Git-or-another-VCS" />
+<meta property="og:site_name" content="Aaron’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-02-24T00:00:00-05:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/The-case-for-system-backups-in-addition-to-Git-or-another-VCS"},"url":"http://localhost:4000/The-case-for-system-backups-in-addition-to-Git-or-another-VCS","author":{"@type":"Person","name":"Aaron Young"},"description":"As a former IT professional, the mantra of backups has been drilled into me. I feel that my fellow software engineers can fall into a false sense of security because we are trained to use a version control system (VCS) like git as part of our development workflow.","@type":"BlogPosting","headline":"The Case For System Backups In Addition To Git Or Another Vcs","dateModified":"2018-02-24T00:00:00-05:00","datePublished":"2018-02-24T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>aaronyoung@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="https://aaronyoung.io"><h2 class="header-link">Portfolio Site</h2></a>
+<a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>The Case For System Backups In Addition To Git Or Another Vcs</h2>
+  <time datetime="2018-02-24T00:00:00-05:00" class="by-line">24 Feb 2018</time>
+  <p>As a former IT professional, the mantra of backups has been drilled into me. I feel that my fellow software engineers can fall into a false sense of security because we are trained to use a version control system (VCS) like git as part of our development workflow.</p>
+
+<p>Backups are needed in addition to source code control because there are many things that are not in our source code. Here are a few things that are important enough to ensure that we do backups, this is by no means an exhaustive list.</p>
+
+<ul>
+  <li>SSH Keys</li>
+  <li>System Aliases</li>
+  <li>Environment variables</li>
+  <li>Code secrets (For example, API keys. These are often stored in a config file outside of Git control, or even within a system environment variable)</li>
+  <li>Software configurations (like your text editor)</li>
+  <li>Local git repositories that are not synced</li>
+  <li>Small scratch projects we do when learning a new api. We often refer to these but don’t put them under source control</li>
+  <li>Internet bookmarks</li>
+  <li>Linter setup</li>
+</ul>
+
+<p>We developers are often doing rapid work day in day out. This may mean that on some days we make no system changes, on other days we make a lot of changes as we put new tools/techniques into place. I highly recommend backups following the <a href="https://www.backblaze.com/blog/the-3-2-1-backup-strategy/">3–2–1</a> rule. Click the link for more details, but here is a quick run-down:</p>
+
+<ul>
+  <li>3 copies of your data (including the original)</li>
+  <li>2 different mediums/devices containing your data</li>
+  <li>1 copy off-site (what if you have a physical disaster?)</li>
+</ul>
+
+<p>This is my setup, and my justification for my setup.</p>
+
+<p>To achieve my 3–2–1 goal, I’ve enlisted two tools. For my local system backup, I’m using Apple OS X’s built-in backup tool, Time Machine. I have my Time Machine configured to backup wirelessly to a networked drive. I took this approach because I didn’t wanted to be rooted in location within my home while backing up. Additionally, I don’t trust myself to regularly plug in my external hard drive. Time Machine gives me the benefits of a complete system restore along with file versioning. With this setup alone I have achieved the 2 different mediums rule, but I am still failing the 1 copy off site &amp; 3 copies of your data.</p>
+
+<p>To achieve the complete rules, I enlisted a cloud backup solution, <a href="https://www.backblaze.com/cloud-backup.html">Backblaze</a> (if you want a free month, <a href="https://secure.backblaze.com/r/01nxgp">click here</a>, we’ll both get a free month). I chose Backblaze for several reasons. First is their flat rate of $50 a year per computer regardless of the data size. Backups can be set to be continuous rather than on a schedule. This means that rather than a set frequency (like time machine of every hour at its default) it will attempt to backup a file every time it changes, as soon as it changes, as long as you’ve access to the backblaze website. This is fantastic, I can have more confidence that my data is being backed up all-the-time, as long as I have internet access. With that, I’ve achieved my goal of 3–2–1. Additionally, backblaze will give me 30 days of file changes, or versions. This is great, should I need it.</p>
+
+<p>The negative of Backblaze? It is not a system-level backup, I cannot do a full restore, but it is better than nothing. The initial backup can take a day or two. Applications will not be backed up, but you can install it again.</p>
+
+<p>I would like to point out that file syncing tools such as dropbox and google drive are not backups. If you make a change or mess up a file, the changes will be synced across all your devices. This is important to note because of issues like ransomware. You want backups to be read-only unless you are explicitly recovering a file.</p>
+
+<p>I hope you found this helpful in your day-to-day coding.</p>
+
+<p>This post has been cross-posted on <a href="https://medium.com/@brainomite/the-case-for-system-backups-in-addition-to-git-or-another-vcs-1f3a54dc5ec5">Medium</a></p>
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>AaronYoung</b>
+    </span>
+    
+    <span>© 2020</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>

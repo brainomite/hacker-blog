@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>How To Auto Reload A Full Stack Javascript Project Using Nodemon And Webpack Dev Server</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>How To Auto Reload A Full Stack Javascript Project Using Nodemon And Webpack Dev Server | Aaron’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="How To Auto Reload A Full Stack Javascript Project Using Nodemon And Webpack Dev Server" />
+<meta name="author" content="Aaron Young" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A couple of weeks ago, when I was under the pressure of time, I decided to attempt to get webpack-dev-server (WDS) running. I failed miserably, and moved on instead of wasting time on the project. Now again, I find myself in need of a tool to speed up development time. Last week I did the research and today I’m sharing for posterity’s sake. Additionally at the time of this article webpack-livereload-plugin is not compatible with webpack 4 that was just released a few days ago. The only downside to this configuration is I cannot use socket.io to communicate between nodemon’s server and WDS’s client." />
+<meta property="og:description" content="A couple of weeks ago, when I was under the pressure of time, I decided to attempt to get webpack-dev-server (WDS) running. I failed miserably, and moved on instead of wasting time on the project. Now again, I find myself in need of a tool to speed up development time. Last week I did the research and today I’m sharing for posterity’s sake. Additionally at the time of this article webpack-livereload-plugin is not compatible with webpack 4 that was just released a few days ago. The only downside to this configuration is I cannot use socket.io to communicate between nodemon’s server and WDS’s client." />
+<link rel="canonical" href="http://localhost:4000/How-to-Auto-reload-a-full-stack-JavaScript-project-using-nodemon-and-webpack-dev-server" />
+<meta property="og:url" content="http://localhost:4000/How-to-Auto-reload-a-full-stack-JavaScript-project-using-nodemon-and-webpack-dev-server" />
+<meta property="og:site_name" content="Aaron’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-02-28T00:00:00-05:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/How-to-Auto-reload-a-full-stack-JavaScript-project-using-nodemon-and-webpack-dev-server"},"url":"http://localhost:4000/How-to-Auto-reload-a-full-stack-JavaScript-project-using-nodemon-and-webpack-dev-server","author":{"@type":"Person","name":"Aaron Young"},"description":"A couple of weeks ago, when I was under the pressure of time, I decided to attempt to get webpack-dev-server (WDS) running. I failed miserably, and moved on instead of wasting time on the project. Now again, I find myself in need of a tool to speed up development time. Last week I did the research and today I’m sharing for posterity’s sake. Additionally at the time of this article webpack-livereload-plugin is not compatible with webpack 4 that was just released a few days ago. The only downside to this configuration is I cannot use socket.io to communicate between nodemon’s server and WDS’s client.","@type":"BlogPosting","headline":"How To Auto Reload A Full Stack Javascript Project Using Nodemon And Webpack Dev Server","dateModified":"2018-02-28T00:00:00-05:00","datePublished":"2018-02-28T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>aaronyoung@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="https://aaronyoung.io"><h2 class="header-link">Portfolio Site</h2></a>
+<a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>How To Auto Reload A Full Stack Javascript Project Using Nodemon And Webpack Dev Server</h2>
+  <time datetime="2018-02-28T00:00:00-05:00" class="by-line">28 Feb 2018</time>
+  <p>A couple of weeks ago, when I was under the pressure of time, I decided to attempt to get webpack-dev-server (WDS) running. I failed miserably, and moved on instead of wasting time on the project. Now again, I find myself in need of a tool to speed up development time. Last week I did the research and today I’m sharing for posterity’s sake. Additionally at the time of this article <a href="https://github.com/statianzo/webpack-livereload-plugin/issues/40">webpack-livereload-plugin is not compatible</a> with webpack 4 that was <a href="https://medium.com/webpack/webpack-4-released-today-6cdb994702d4">just released</a> a few days ago. The only downside to this configuration is I cannot use socket.io to communicate between nodemon’s server and WDS’s client.</p>
+
+<p>I’m in the middle of a rapid development of a full-stack javascript single page application (SPA). I decided that having a backend refresh automatically with each code save using nodemon would be ideal so I could implement a RESTful API. Additionally I wanted my bundle to be rebuilt and my browser to also refresh when the bundle is ready. For those two things combined, WDS will achieve my goals.</p>
+
+<p>Here are the changes I had to make to my webpack.config.js &amp; package.json file. At the end of the article I have my entire final webpack.config.js file in one shot, should you wish to copy it.
+First install necessary packages if you don’t already have them using npm or yarn</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm install --save-dev nodemon webpack-dev-server webpack-cli
+</code></pre></div></div>
+
+<p>Before I started my output property was set to as follows:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">output</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">path</span><span class="p">:</span> <span class="nx">__dirname</span><span class="p">,</span>
+  <span class="nx">filename</span><span class="p">:</span> <span class="dl">'</span><span class="s1">./public/bundle.js</span><span class="dl">'</span><span class="p">,</span>
+<span class="p">},</span>
+</code></pre></div></div>
+
+<p>The problem with this is that when WDS runs, it’ll make the bundle available at http://yourUrl:yourPort/public/bundle.js to fix this, I required ‘path’ and changed my setting to the following:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">output</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">path</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/public</span><span class="dl">'</span><span class="p">),</span>
+  <span class="nx">filename</span><span class="p">:</span> <span class="dl">'</span><span class="s1">bundle.js</span><span class="dl">'</span>
+<span class="p">},</span>
+</code></pre></div></div>
+
+<p>Next are a series of settings that go within an object at the property ‘devServer’ first up are two commands related to my static folder path. The first is the path of static content that’ll be served up at the root of the site. Second is a flag indicating whether to auto refresh if the static content changes, it is defaulted to false.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">devServer</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">contentBase</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/public</span><span class="dl">'</span><span class="p">),</span> <span class="c1">//serve your static files from here</span>
+  <span class="nx">watchContentBase</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Next up, because I want nodemon to host my api routes, I needed to set up a proxy. This basically tells WDS to play man-in-the-middle and and redirect your request to the nodemon instance. It is important that your nodemon instance and your WDS do NOT share the same ports, that will cause an error.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">proxy</span><span class="p">:</span> <span class="p">[</span> <span class="c1">// allows redirect of requests to webpack-dev-server to another destination</span>
+  <span class="p">{</span>
+    <span class="na">context</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">/api</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/auth</span><span class="dl">'</span><span class="p">],</span>  <span class="c1">// can have multiple</span>
+    <span class="na">target</span><span class="p">:</span> <span class="dl">'</span><span class="s1">http://localhost:8080</span><span class="dl">'</span><span class="p">,</span> <span class="c1">//server and port to redirect to</span>
+    <span class="na">secure</span><span class="p">:</span> <span class="kc">false</span> <span class="c1">//don't use https</span>
+  <span class="p">}</span>
+<span class="p">],</span>
+</code></pre></div></div>
+
+<p>Last important setting is the port, this allows you to override WDS’s default port of 8080 should you want. Additionally I found these interesting settings that will allow me to know if I have a build warning or error without having to stare at the console.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">port</span><span class="p">:</span> <span class="mi">3000</span><span class="p">,</span> <span class="c1">// port webpack-dev-server listens to, defaults to 8080</span>
+<span class="nx">overlay</span><span class="p">:</span> <span class="p">{</span> <span class="c1">// Shows a full-screen overlay in the browser when there are compiler errors or warnings</span>
+  <span class="nl">warnings</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// default false</span>
+  <span class="nx">errors</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">//default false</span>
+<span class="p">},</span>
+</code></pre></div></div>
+
+<p>Last but not least I added the following scripts to my package.json. The last 3 scripts just open the main page using the specified browser. The — hot option enables Hot Module Replacement. One extra tidbit, when WDS bundles up the JS files, it serves it from memory. Don’t worry if you don’t observe a bundle.js in your file system after triggering these scripts.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"test"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodemon ./server/index.js"</span><span class="err">,</span><span class="w">
+</span><span class="nl">"WDS"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npm test &amp; webpack-dev-server --inline --hot"</span><span class="err">,</span><span class="w">
+</span><span class="nl">"WDSC"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npm test &amp; webpack-dev-server --inline --hot --open 'Google Chrome'"</span><span class="err">,</span><span class="w">
+</span><span class="nl">"WDSF"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npm test &amp; webpack-dev-server --inline --hot --open 'Firefox'"</span><span class="err">,</span><span class="w">
+</span><span class="nl">"WDSS"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npm test &amp; webpack-dev-server --inline --hot --open 'Safari'"</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Finally here is my completed webpack.config.js:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">"</span><span class="s2">path</span><span class="dl">"</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">isDev</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">===</span> <span class="dl">"</span><span class="s2">development</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">mode</span><span class="p">:</span> <span class="nx">isDev</span> <span class="p">?</span> <span class="dl">"</span><span class="s2">development</span><span class="dl">"</span> <span class="p">:</span> <span class="dl">"</span><span class="s2">production</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">entry</span><span class="p">:</span> <span class="p">[</span>
+    <span class="dl">"</span><span class="s2">@babel/polyfill</span><span class="dl">"</span><span class="p">,</span> <span class="c1">// enables async-await</span>
+    <span class="dl">"</span><span class="s2">./client/index.js</span><span class="dl">"</span><span class="p">,</span>
+  <span class="p">],</span>
+  <span class="na">output</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">path</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="dl">"</span><span class="s2">/public</span><span class="dl">"</span><span class="p">),</span>
+    <span class="na">filename</span><span class="p">:</span> <span class="dl">"</span><span class="s2">bundle.js</span><span class="dl">"</span><span class="p">,</span> <span class="c1">// relative to the outputPath (defaults to / or root of the site)</span>
+  <span class="p">},</span>
+  <span class="na">devtool</span><span class="p">:</span> <span class="dl">"</span><span class="s2">source-map</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">module</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">rules</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">jsx</span><span class="se">?</span><span class="sr">$/</span><span class="p">,</span>
+        <span class="na">exclude</span><span class="p">:</span> <span class="sr">/node_modules/</span><span class="p">,</span>
+        <span class="na">loader</span><span class="p">:</span> <span class="dl">"</span><span class="s2">babel-loader</span><span class="dl">"</span><span class="p">,</span>
+      <span class="p">},</span>
+    <span class="p">],</span>
+  <span class="p">},</span>
+  <span class="na">devServer</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">contentBase</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="dl">"</span><span class="s2">/public</span><span class="dl">"</span><span class="p">),</span> <span class="c1">// serve your static files from here</span>
+    <span class="na">watchContentBase</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// initiate a page refresh if static content changes</span>
+    <span class="na">proxy</span><span class="p">:</span> <span class="p">[</span>
+      <span class="c1">// allows redirect of requests to webpack-dev-server to another destination</span>
+      <span class="p">{</span>
+        <span class="na">context</span><span class="p">:</span> <span class="p">[</span><span class="dl">"</span><span class="s2">/api</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">/auth</span><span class="dl">"</span><span class="p">],</span> <span class="c1">// can have multiple</span>
+        <span class="na">target</span><span class="p">:</span> <span class="dl">"</span><span class="s2">http://localhost:8080</span><span class="dl">"</span><span class="p">,</span> <span class="c1">// server and port to redirect to</span>
+        <span class="na">secure</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+      <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="na">port</span><span class="p">:</span> <span class="mi">3030</span><span class="p">,</span> <span class="c1">// port webpack-dev-server listens to, defaults to 8080</span>
+    <span class="na">overlay</span><span class="p">:</span> <span class="p">{</span>
+      <span class="c1">// Shows a full-screen overlay in the browser when there are compiler errors or warnings</span>
+      <span class="na">warnings</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// defaults to false</span>
+      <span class="na">errors</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// defaults to false</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>This was cross-posted on <a href="https://itnext.io/auto-reload-a-full-stack-javascript-project-using-nodemon-and-webpack-dev-server-together-a636b271c4e">Medium</a></p>
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>AaronYoung</b>
+    </span>
+    
+    <span>© 2020</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>
