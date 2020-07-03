@@ -1,16 +1,16 @@
-title: Hacker-Blog
-description: "A Jekyll Blog Theme For Hackers"
+title: Aaron's Blog
+description: "A collection of thoughts as I strive to be a better developer"
 author:
-  name: "SomeHacker"
-  email: "someone@somewebsite.somedomain"
-  url: "https://ashishchaudhary.in/hacker-blog"
+  name: "Aaron Young"
+  email: "hi@aaronyoung.io"
+  url: "https://blog.aaronyoung.io"
 
 baseurl: /
 
 source: .
 destination: ./docs
 permalink: /:title
-paginate: 3
+paginate: 5
 paginate_path: /page/:num/
 
 defaults:
@@ -27,5 +27,5 @@ plugins:
   - jekyll-sitemap
 
 # Custom variables
-owner: "SomeHacker"
+owner: "AaronYoung"
 year: "2020"
