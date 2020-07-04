@@ -1,27 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://localhost:4000/Sample-Page</loc>
-<lastmod>2017-12-12T00:00:00-05:00</lastmod>
-</url>
-<url>
-<loc>http://localhost:4000/The-case-for-system-backups-in-addition-to-Git-or-another-VCS</loc>
+<loc>/The-case-for-system-backups-in-addition-to-Git-or-another-VCS</loc>
 <lastmod>2018-02-24T00:00:00-05:00</lastmod>
 </url>
 <url>
-<loc>http://localhost:4000/How-to-Auto-reload-a-full-stack-JavaScript-project-using-nodemon-and-webpack-dev-server</loc>
+<loc>/How-to-Auto-reload-a-full-stack-JavaScript-project-using-nodemon-and-webpack-dev-server</loc>
 <lastmod>2018-02-28T00:00:00-05:00</lastmod>
 </url>
 <url>
-<loc>http://localhost:4000/404</loc>
+<loc>/404</loc>
 </url>
 <url>
-<loc>http://localhost:4000/about</loc>
+<loc>/about</loc>
 </url>
 <url>
-<loc>http://localhost:4000/archive</loc>
+<loc>/archive</loc>
 </url>
 <url>
-<loc>http://localhost:4000/</loc>
+<loc>/</loc>
 </url>
 </urlset>
